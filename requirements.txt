@@ -6,4 +6,5 @@ streamlit
 streamlit-extras
 google-genai
 google-api-core
+cerebras_cloud_sdk
 groq
