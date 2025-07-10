@@ -44,21 +44,85 @@ def _inject_css():
 
 
 # ─────────────────────────────────────────────
-def header(img_paths):
-    """Three images side-by-side beneath a title."""
-    _inject_css()
-    with st.container():
-        st.markdown(
-            "<h1 style='text-align:center;margin-top:-0.5rem; "
-            "color:var(--accent);letter-spacing:0.02em;'>Aditya Tarot</h1>",
-            unsafe_allow_html=True,
-        )
-        cols = st.columns([1, 1, 1])
-        for col, img in zip(cols, img_paths):
-            with col:
-                st.markdown('<div class="tarot-banner">', unsafe_allow_html=True)
-                st.image(img)
-                st.markdown("</div>", unsafe_allow_html=True)
+import streamlit as st
+from pathlib import Path
+from typing import Sequence, Union
+
+ImagePath = Union[str, Path]
+
+def header(
+    img_paths: Sequence[ImagePath],
+    title: str = "Aditya Tarot’s Reading",
+) -> None:
+    """Render a responsive, three-panel banner with a stylized title.
+
+    Parameters
+    ----------
+    img_paths : Sequence[str | Path]
+        Paths or URLs of up to three images to show side-by-side.
+    title : str
+        Display title (defaults to “Aditya Tarot’s Reading”).
+    """
+    _inject_css()  # inject only once per session
+
+    # Title
+    st.markdown(f"<h1 class='tarot-title'>{title}</h1>", unsafe_allow_html=True)
+
+    # Three evenly-spaced columns with a little breathing room
+    cols = st.columns(3, gap="small")
+    for col, img in zip(cols, img_paths[:3]):          # ignore extras gracefully
+        with col:
+            st.markdown('<div class="tarot-banner">', unsafe_allow_html=True)
+            st.image(img, use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+
+
+# ─────────────────────────────────────────────────────────────────────
+def _inject_css() -> None:
+    """Inject custom CSS once per session."""
+    if st.session_state.get("_tarot_css_injected"):
+        return
+    st.session_state["_tarot_css_injected"] = True
+
+    st.markdown(
+        """
+        <style>
+        /* Google font for a touch of elegance */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
+
+        .tarot-title {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            margin: -0.3rem 0 1.2rem;
+            letter-spacing: 0.03em;
+            /* Fallback to Streamlit’s accent color var */
+            color: var(--accent, #8e44ad);
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .tarot-banner img {
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,.25);
+            transition: transform .35s ease, box-shadow .35s ease;
+        }
+        .tarot-banner img:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 6px 18px rgba(0,0,0,.35);
+        }
+
+        /* Mobile tweaks */
+        @media (max-width: 768px) {
+            .tarot-banner img { margin-bottom: 0.8rem; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 # ─────────────────────────────────────────────

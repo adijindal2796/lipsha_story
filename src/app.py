@@ -42,7 +42,7 @@ def main():
     st.set_page_config(
         layout="wide",
         initial_sidebar_state="collapsed",
-        page_title="Aditya Tarot - Virtual Tarot Readings",
+        page_title="Aditya's Tarot - Virtual Tarot Readings",
     )
     header(st.session_state.header_images)
 
