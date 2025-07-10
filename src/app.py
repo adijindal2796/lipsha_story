@@ -16,6 +16,9 @@ from session_mgr   import (
     save_session,
 )
 
+from ui import render_chat   # wherever you placed the helper
+
+
 # ────────────────────────────────────────────────────────────────
 def main():
     # ══════════ 1. bootstrap / resume session ═══════════════════
@@ -48,24 +51,10 @@ def main():
         intro_view()
         return  # nothing else to do yet
 
-    # ══════════ 4. reading UI – top avatar & history ════════════
-    st.image(st.session_state.Aditya_image, width=180)
 
-    for msg in chat.history:
-        if msg["role"] == "assistant":
-            st.write(extract_commands(msg["content"]).cleaned_content)
-        elif msg["role"] == "user":
-            st.markdown(
-                f"<div style='color: yellow;'>&gt; {msg['content']}</div>",
-                unsafe_allow_html=True,
-            )
-        elif msg["role"] == "system" and msg["content"].startswith(
-            "The selected cards were"
-        ):
-            st.markdown(
-                f"<div style='color: red;'>&gt; {msg['content']}</div>",
-                unsafe_allow_html=True,
-            )
+
+
+    render_chat(chat.history)
 
     ai_cmds = extract_commands(chat.history[-1]["content"])
 
@@ -171,7 +160,7 @@ def main():
                     st.session_state.chosen_virtual_cards = []
 
                 # call the LLM (with simple retry loop)
-                with st.spinner("Generating AI response"):
+                with st.spinner("Just wait cutiiee"):
                     for attempt in range(3):
                         resp = get_ai_response(chat.history)
                         print("debug here")
